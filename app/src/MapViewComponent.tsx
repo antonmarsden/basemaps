@@ -24,7 +24,7 @@ import { stylefunction } from "ol-mapbox-style";
 import { PMTilesVectorSource } from "ol-pmtiles";
 import { useGeographic } from "ol/proj";
 
-import { FileAPISource, PMTiles, Protocol } from "pmtiles";
+import { FileSource, PMTiles, Protocol } from "pmtiles";
 import { createHash, parseHash } from "./hash";
 
 const GIT_SHA = (import.meta.env.VITE_GIT_SHA || "main").substr(0, 8);
@@ -66,6 +66,14 @@ const FeaturesProperties = (props: { features: MapGeoJSONFeature[] }) => {
   );
 };
 
+export const isValidPMTiles = (tiles?: string): boolean => {
+  if (!tiles) return false;
+  if (!tiles.startsWith("http") && tiles.endsWith(".pmtiles")) return true;
+  if (tiles.startsWith("http") && new URL(tiles).pathname.endsWith(".pmtiles"))
+    return true;
+  return false;
+};
+
 function getMaplibreStyle(
   theme: string,
   tiles?: string,
@@ -74,19 +82,18 @@ function getMaplibreStyle(
   minZoom?: number,
   maxZoom?: number,
 ): StyleSpecification {
-  let tilesWithProtocol = tiles;
-  if (
-    tilesWithProtocol &&
-    new URL(tilesWithProtocol).pathname.endsWith(".pmtiles")
-  ) {
-    tilesWithProtocol = `pmtiles://${tiles}`;
-  }
   const style = {
     version: 8 as unknown,
     sources: {},
     layers: [],
   } as StyleSpecification;
-  if (!tilesWithProtocol) return style;
+  if (!tiles) return style;
+  let tilesWithProtocol: string;
+  if (isValidPMTiles(tiles)) {
+    tilesWithProtocol = `pmtiles://${tiles}`;
+  } else {
+    tilesWithProtocol = tiles;
+  }
   style.layers = [];
   style.glyphs =
     "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf";
@@ -324,7 +331,7 @@ export default function MapViewComponent() {
   });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setDroppedArchive(new PMTiles(new FileAPISource(acceptedFiles[0])));
+    setDroppedArchive(new PMTiles(new FileSource(acceptedFiles[0])));
   }, []);
 
   const { getRootProps } = useDropzone({ onDrop });

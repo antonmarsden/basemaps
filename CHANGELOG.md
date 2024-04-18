@@ -1,3 +1,24 @@
+Tiles v3.5.1
+------
+- Order landcover by kind consistently [#154]
+
+Tiles v3.5.0
+------
+- Add Daylight Landcover from zooms 0-7. [#154]
+
+Tiles v3.4.1
+------
+- Improve boundaries generalization [#200]
+
+Tiles v3.4.0, Styles v2.0.0-alpha.5
+------
+- Add `village_green`, `landuse`, `allotments` to POI layer via @lenalebt [#204]
+- Add to styles via `landuse_urban_green` layer
+
+Tiles v3.3.0
+------
+- Improve water generalization detail by doing area filtering post-merge [#198]
+
 Tiles v3.2.0
 ------
 - Add `village_green` and `allotments` to landuse layer via @lenalebt [#206]
